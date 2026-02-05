@@ -907,11 +907,9 @@ void main() {
 #endif
 	}
 
-	uint env_ray_count = 100;
-
-	if (env_ray_count > 0) {
+	if (bake_params.env_ray_count > 0) {
 		vec3 env_accum = vec3(0.0);
-		for (uint i = 0; i < env_ray_count; i++) {
+		for (uint i = 0; i < bake_params.env_ray_count; i++) {
 			vec3 ray_dir = generate_ray_dir_from_normal(normal, noise);
 			uint tidx;
 			vec3 barycentric;
@@ -920,7 +918,7 @@ void main() {
 				env_accum += trace_environment_color(-ray_dir);
 			}
 		}
-		vec3 env_color = env_accum / float(env_ray_count);
+		vec3 env_color = env_accum / float(bake_params.env_ray_count);
 		light_for_texture += env_color;
 		light_for_bounces += env_color;
 	}

@@ -201,6 +201,7 @@ private:
 	Ref<Sky> environment_custom_sky;
 	Color environment_custom_color = Color(1, 1, 1);
 	float environment_custom_energy = 1.0;
+	int environment_ray_count = 0;
 	bool directional = false;
 	bool use_texture_for_bounces = true;
 	LightmapGIData::ShadowmaskMode shadowmask_mode = LightmapGIData::SHADOWMASK_MODE_NONE;
@@ -315,6 +316,9 @@ public:
 
 	void set_environment_custom_energy(float p_energy);
 	float get_environment_custom_energy() const;
+
+	void set_environment_ray_count(int p_environment_ray_count);
+	int get_environment_ray_count() const;
 
 	void set_bounces(int p_bounces);
 	int get_bounces() const;

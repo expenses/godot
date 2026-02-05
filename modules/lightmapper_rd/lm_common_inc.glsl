@@ -19,6 +19,7 @@ layout(set = 0, binding = 0) uniform BakeParameters {
 	int shadowmask_light_idx;
 	uint transparency_rays;
 	float supersampling_factor;
+	uint env_ray_count;
 }
 bake_params;
 

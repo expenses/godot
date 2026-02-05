@@ -1278,7 +1278,7 @@ LightmapGI::BakeError LightmapGI::bake(Node *p_from_node, String p_image_data_pa
 
 	Lightmapper::BakeError bake_err = lightmapper->bake(Lightmapper::BakeQuality(bake_quality), use_denoiser, denoiser_strength, denoiser_range, bounces,
 			bounce_indirect_energy, bias, max_texture_size, directional, shadowmask_mode != LightmapGIData::SHADOWMASK_MODE_NONE, use_texture_for_bounces,
-			Lightmapper::GenerateProbes(gen_probes), environment_image, environment_transform, _lightmap_bake_step_function, &bsud, exposure_normalization, (supersampling_enabled ? supersampling_factor : 1));
+			Lightmapper::GenerateProbes(gen_probes), environment_image, environment_transform, _lightmap_bake_step_function, &bsud, exposure_normalization, (supersampling_enabled ? supersampling_factor : 1), environment_ray_count);
 
 	if (bake_err == Lightmapper::BAKE_ERROR_TEXTURE_EXCEEDS_MAX_SIZE) {
 		return BAKE_ERROR_TEXTURE_SIZE_TOO_SMALL;
@@ -1785,6 +1785,14 @@ float LightmapGI::get_supersampling_factor() const {
 	return supersampling_factor;
 }
 
+void LightmapGI::set_environment_ray_count(int p_environment_ray_count) {
+	environment_ray_count = p_environment_ray_count;
+}
+
+int LightmapGI::get_environment_ray_count() const {
+	return environment_ray_count;
+}
+
 void LightmapGI::set_generate_probes(GenerateProbes p_generate_probes) {
 	gen_probes = p_generate_probes;
 }
@@ -1878,6 +1886,9 @@ void LightmapGI::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_environment_custom_energy", "energy"), &LightmapGI::set_environment_custom_energy);
 	ClassDB::bind_method(D_METHOD("get_environment_custom_energy"), &LightmapGI::get_environment_custom_energy);
 
+	ClassDB::bind_method(D_METHOD("set_environment_ray_count", "ray_count"), &LightmapGI::set_environment_ray_count);
+	ClassDB::bind_method(D_METHOD("get_environment_ray_count"), &LightmapGI::get_environment_ray_count);
+
 	ClassDB::bind_method(D_METHOD("set_texel_scale", "texel_scale"), &LightmapGI::set_texel_scale);
 	ClassDB::bind_method(D_METHOD("get_texel_scale"), &LightmapGI::get_texel_scale);
 
@@ -1937,6 +1948,7 @@ void LightmapGI::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "environment_custom_sky", PROPERTY_HINT_RESOURCE_TYPE, Sky::get_class_static()), "set_environment_custom_sky", "get_environment_custom_sky");
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "environment_custom_color", PROPERTY_HINT_COLOR_NO_ALPHA), "set_environment_custom_color", "get_environment_custom_color");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "environment_custom_energy", PROPERTY_HINT_RANGE, "0,64,0.01"), "set_environment_custom_energy", "get_environment_custom_energy");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "environment_ray_count", PROPERTY_HINT_RANGE, "0,1024,1"), "set_environment_ray_count", "get_environment_ray_count");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "camera_attributes", PROPERTY_HINT_RESOURCE_TYPE, "CameraAttributesPractical,CameraAttributesPhysical"), "set_camera_attributes", "get_camera_attributes");
 	ADD_GROUP("Gen Probes", "generate_probes_");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "generate_probes_subdiv", PROPERTY_HINT_ENUM, "Disabled,4,8,16,32"), "set_generate_probes", "get_generate_probes");

@@ -1059,7 +1059,7 @@ LightmapperRD::BakeError LightmapperRD::_denoise(RenderingDevice *p_rd, Ref<RDSh
 	return BAKE_OK;
 }
 
-LightmapperRD::BakeError LightmapperRD::bake(BakeQuality p_quality, bool p_use_denoiser, float p_denoiser_strength, int p_denoiser_range, int p_bounces, float p_bounce_indirect_energy, float p_bias, int p_max_texture_size, bool p_bake_sh, bool p_bake_shadowmask, bool p_texture_for_bounces, GenerateProbes p_generate_probes, const Ref<Image> &p_environment_panorama, const Basis &p_environment_transform, BakeStepFunc p_step_function, void *p_bake_userdata, float p_exposure_normalization, float p_supersampling_factor) {
+LightmapperRD::BakeError LightmapperRD::bake(BakeQuality p_quality, bool p_use_denoiser, float p_denoiser_strength, int p_denoiser_range, int p_bounces, float p_bounce_indirect_energy, float p_bias, int p_max_texture_size, bool p_bake_sh, bool p_bake_shadowmask, bool p_texture_for_bounces, GenerateProbes p_generate_probes, const Ref<Image> &p_environment_panorama, const Basis &p_environment_transform, BakeStepFunc p_step_function, void *p_bake_userdata, float p_exposure_normalization, float p_supersampling_factor, int p_environment_ray_count) {
 	int denoiser = GLOBAL_GET("rendering/lightmapping/denoising/denoiser");
 	String oidn_path = EDITOR_GET("filesystem/tools/oidn/oidn_denoise_path");
 
@@ -1357,6 +1357,7 @@ LightmapperRD::BakeError LightmapperRD::bake(BakeQuality p_quality, bool p_use_d
 	// Same number of rays for transparency regardless of quality (it's more of a retry rather than shooting new ones).
 	bake_parameters.transparency_rays = GLOBAL_GET("rendering/lightmapping/bake_performance/max_transparency_rays");
 	bake_parameters.supersampling_factor = p_supersampling_factor;
+	bake_parameters.env_ray_count = p_environment_ray_count;
 
 	bake_parameters_buffer = rd->uniform_buffer_create(sizeof(BakeParameters));
 	rd->buffer_update(bake_parameters_buffer, 0, sizeof(BakeParameters), &bake_parameters);

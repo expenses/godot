@@ -59,6 +59,10 @@ class LightmapperRD : public Lightmapper {
 		uint32_t shadowmask_light_idx = 0;
 		uint32_t transparency_rays = 0;
 		float supersampling_factor = 0.0f;
+		uint32_t env_ray_count = 0;
+		uint pad_1 = 0;
+		uint pad_2 = 0;
+		uint pad_3 = 0;
 	};
 
 	struct MeshInstance {
@@ -303,7 +307,7 @@ public:
 	virtual void add_omni_light(const String &p_name, bool p_static, const Vector3 &p_position, const Color &p_color, float p_energy, float p_indirect_energy, float p_range, float p_attenuation, float p_size, float p_shadow_blur) override;
 	virtual void add_spot_light(const String &p_name, bool p_static, const Vector3 &p_position, const Vector3 p_direction, const Color &p_color, float p_energy, float p_indirect_energy, float p_range, float p_attenuation, float p_spot_angle, float p_spot_attenuation, float p_size, float p_shadow_blur) override;
 	virtual void add_probe(const Vector3 &p_position) override;
-	virtual BakeError bake(BakeQuality p_quality, bool p_use_denoiser, float p_denoiser_strength, int p_denoiser_range, int p_bounces, float p_bounce_indirect_energy, float p_bias, int p_max_texture_size, bool p_bake_sh, bool p_bake_shadowmask, bool p_texture_for_bounces, GenerateProbes p_generate_probes, const Ref<Image> &p_environment_panorama, const Basis &p_environment_transform, BakeStepFunc p_step_function = nullptr, void *p_bake_userdata = nullptr, float p_exposure_normalization = 1.0, float p_supersampling_factor = 1.0f) override;
+	virtual BakeError bake(BakeQuality p_quality, bool p_use_denoiser, float p_denoiser_strength, int p_denoiser_range, int p_bounces, float p_bounce_indirect_energy, float p_bias, int p_max_texture_size, bool p_bake_sh, bool p_bake_shadowmask, bool p_texture_for_bounces, GenerateProbes p_generate_probes, const Ref<Image> &p_environment_panorama, const Basis &p_environment_transform, BakeStepFunc p_step_function = nullptr, void *p_bake_userdata = nullptr, float p_exposure_normalization = 1.0, float p_supersampling_factor = 1.0f, int p_environment_ray_count = 0) override;
 
 	int get_bake_texture_count() const override;
 	Ref<Image> get_bake_texture(int p_index) const override;
