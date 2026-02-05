@@ -1179,10 +1179,8 @@ LightmapperRD::BakeError LightmapperRD::bake(BakeQuality p_quality, bool p_use_d
 	rd->free_rid(light_accum_tex2); \
 	rd->free_rid(light_accum_tex); \
 	rd->free_rid(light_environment_tex); \
-	if (p_bake_shadowmask) { \
-		rd->free_rid(shadowmask_tex); \
-		rd->free_rid(shadowmask_tex2); \
-	}
+	rd->free_rid(shadowmask_tex); \
+	rd->free_rid(shadowmask_tex2); \
 
 	{ // create all textures
 
@@ -1217,7 +1215,7 @@ LightmapperRD::BakeError LightmapperRD::bake(BakeQuality p_quality, bool p_use_d
 		tf.usage_bits = RD::TEXTURE_USAGE_COLOR_ATTACHMENT_BIT | RD::TEXTURE_USAGE_SAMPLING_BIT | RD::TEXTURE_USAGE_STORAGE_BIT | RD::TEXTURE_USAGE_CAN_COPY_FROM_BIT | RD::TEXTURE_USAGE_CAN_COPY_TO_BIT | RD::TEXTURE_USAGE_CAN_UPDATE_BIT;
 
 		// shadowmask
-		if (p_bake_shadowmask) {
+		{
 			tf.format = RD::DATA_FORMAT_R8G8B8A8_UNORM;
 
 			shadowmask_tex = rd->texture_create(tf, RD::TextureView());
@@ -1745,11 +1743,19 @@ LightmapperRD::BakeError LightmapperRD::bake(BakeQuality p_quality, bool p_use_d
 				uniforms.push_back(u);
 			}
 
-			if (p_bake_shadowmask) {
+			{
 				RD::Uniform u;
 				u.uniform_type = RD::UNIFORM_TYPE_IMAGE;
 				u.binding = 5;
 				u.append_id(shadowmask_tex);
+				uniforms.push_back(u);
+			}
+
+			{
+				RD::Uniform u;
+				u.uniform_type = RD::UNIFORM_TYPE_TEXTURE;
+				u.binding = 6;
+				u.append_id(light_environment_tex);
 				uniforms.push_back(u);
 			}
 		}
@@ -1864,8 +1870,15 @@ LightmapperRD::BakeError LightmapperRD::bake(BakeQuality p_quality, bool p_use_d
 			}
 			{
 				RD::Uniform u;
-				u.uniform_type = RD::UNIFORM_TYPE_TEXTURE;
+				u.uniform_type = RD::UNIFORM_TYPE_IMAGE;
 				u.binding = 5;
+				u.append_id(shadowmask_tex);
+				uniforms.push_back(u);
+			}
+			{
+				RD::Uniform u;
+				u.uniform_type = RD::UNIFORM_TYPE_TEXTURE;
+				u.binding = 6;
 				u.append_id(light_environment_tex);
 				uniforms.push_back(u);
 			}

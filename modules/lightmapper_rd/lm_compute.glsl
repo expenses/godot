@@ -60,10 +60,10 @@ layout(rgba16f, set = 1, binding = 4) uniform restrict image2DArray accum_light;
 
 #endif
 
-#if defined(MODE_DIRECT_LIGHT) && defined(USE_SHADOWMASK)
+#if defined(MODE_DIRECT_LIGHT) || defined(MODE_BOUNCE_LIGHT)
 layout(rgba8, set = 1, binding = 5) uniform restrict writeonly image2DArray shadowmask;
-#elif defined(MODE_BOUNCE_LIGHT)
-layout(set = 1, binding = 5) uniform texture2D environment;
+
+layout(set = 1, binding = 6) uniform texture2D environment;
 #endif
 
 #if defined(MODE_DILATE) || defined(MODE_DENOISE) || defined(MODE_PACK_L1_COEFFS)
@@ -656,7 +656,7 @@ void trace_direct_light(vec3 p_position, vec3 p_normal, uint p_light_index, bool
 
 #endif
 
-#if defined(MODE_BOUNCE_LIGHT) || defined(MODE_LIGHT_PROBES)
+#if defined(MODE_DIRECT_LIGHT) || defined(MODE_BOUNCE_LIGHT) || defined(MODE_LIGHT_PROBES)
 
 vec3 trace_environment_color(vec3 ray_dir) {
 	vec3 sky_dir = normalize(mat3(bake_params.env_transform) * ray_dir);
@@ -905,6 +905,24 @@ void main() {
 			shadowmask_value = max(shadowmask_value, shadow);
 		}
 #endif
+	}
+
+	uint env_ray_count = 100;
+
+	if (env_ray_count > 0) {
+		vec3 env_accum = vec3(0.0);
+		for (uint i = 0; i < env_ray_count; i++) {
+			vec3 ray_dir = generate_ray_dir_from_normal(normal, noise);
+			uint tidx;
+			vec3 barycentric;
+			uint trace_result = trace_ray_closest_hit_triangle(position + ray_dir * bake_params.bias, position + ray_dir * length(bake_params.world_size), tidx, barycentric);
+			if (trace_result == RAY_MISS) {
+				env_accum += trace_environment_color(-ray_dir);
+			}
+		}
+		vec3 env_color = env_accum / float(env_ray_count);
+		light_for_texture += env_color;
+		light_for_bounces += env_color;
 	}
 
 	light_for_bounces *= bake_params.exposure_normalization;
