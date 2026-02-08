@@ -12,9 +12,11 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
       in {
-        devShells.default = pkgs.godot;
+        #devShells.default = pkgs.godot;
         devShells.run = with pkgs;
           mkShell {
+          	inherit (pkgs.godot) nativeBuildInputs buildInputs;
+          
             LD_LIBRARY_PATH = lib.makeLibraryPath [
               fontconfig
               wayland
